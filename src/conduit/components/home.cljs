@@ -64,20 +64,21 @@
     (map #(rum/with-key (TagItem %) %) tags)]])
 
 
-(rum/defc PageItem [label page slug]
+(rum/defc PageItem [label page tag]
+  ;; (js/console.log "page item" label page tag)
   [:li.page-item
    (when (= label page)
      {:class "active"})
    [:a.page-link
-    (if slug
-      {:href (str "/" slug "/" label)}
-      {:href (str "/" label)})
+    (if tag
+      {:href (str "#/" tag "/" label)}
+      {:href (str "#/" label)})
     label]])
 
-(rum/defc Pagination [{:keys [page pages-count slug]}]
+(rum/defc Pagination [{:keys [page pages-count tag]}]
   (when-not (zero? pages-count)
     [:nav {}
-     (map #(rum/with-key (PageItem % page slug) %)
+     (map #(rum/with-key (PageItem % page tag) %)
           (range 1 (inc pages-count)))]))
 
 
@@ -111,7 +112,7 @@
               :pagination
               {:pages-count pages-count
                :page page
-               :slug id}
+               :tag id}
               :tags tags
               :tabs
               [{:label "Your Feed"
@@ -133,6 +134,7 @@
      :articles :load
      :tags :load})
   [r route params]
+  (js/console.log params)
   (let [articles (rum/react (citrus/subscription r [:articles]))
         tags (rum/react (citrus/subscription r [:tags]))]
     (-Home r articles tags nil)))
@@ -143,6 +145,7 @@
     {:tag-articles :load
      :tags :load})
   [r route {:keys [id]}]
+  (js/console.log "home tag render" id)
   (let [tag-articles (rum/react (citrus/subscription r [:tag-articles]))
         tags (rum/react (citrus/subscription r [:tags]))]
     (-Home r tag-articles tags id)))

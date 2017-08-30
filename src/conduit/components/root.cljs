@@ -7,6 +7,7 @@
 (rum/defc Root < rum/reactive [r]
   (let [{route :handler params :route-params}
         (rum/react (citrus/subscription r [:router]))]
+    (js/console.log "params" params)
     (case route
       :home (home/Home r route params)
       :tag (home/HomeTag r route params)

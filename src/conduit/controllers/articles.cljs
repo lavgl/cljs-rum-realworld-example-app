@@ -14,12 +14,23 @@
 (defmethod control :init []
   {:state initial-state})
 
-(defmethod control :load [_ _ state]
+
+(defn page->offset [page]
+  (* 20 (- page 1)))
+
+(defn ->params [{:keys [page]}]
+  (when (not= page nil)
+    {:offset (page->offset page)}))
+
+(defmethod control :load [_ [{:keys [page]}] state]
+  (js/console.log "controller" page)
   {:state (assoc state :loading? true)
    :http {:endpoint :articles
-          :on-load :load-ready}})
+          :params (->params {:page page})
+          :on-load [:load-ready page]}})
 
-(defmethod control :load-ready [_ [{:keys [articles articlesCount]}] state]
+(defmethod control :load-ready [action [{:keys [articles articlesCount]}] state]
+  (js/console.log "load ready" action)
   {:state
    (-> state
        (assoc :articles articles)

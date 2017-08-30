@@ -1,6 +1,7 @@
 (ns conduit.core
   (:require [rum.core :as rum]
             [citrus.core :as citrus]
+            [bidi.verbose :as r]
             [goog.dom :as dom]
             [conduit.effects :as effects]
             [conduit.router :as router]
@@ -14,10 +15,21 @@
             [conduit.components.home :as home]
             [conduit.components.article :refer [Article]]))
 
+;; (def routes
+;;   ["/" [["" ["" :home]
+;;          [["/" :page] :home]]
+;;         [["tag/" :id] [["" :tag]
+;;                        [["/" :page] :tag]]]
+;;         [["article/" :id] :article]]])
+
 (def routes
-  ["/" [["" :home]
-        [["tag/" :id] :tag]
-        [["article/" :id] :article]]])
+  (r/branch "/"
+            (r/branch ""
+                      (r/branch "" (r/param :page) (r/leaf "" :home))
+                      (r/leaf "" :home))
+            (r/branch "tag/" (r/param :id) (r/leaf "" :tag))
+            (r/branch "article/" (r/param :id) (r/leaf "" :article))))
+
 
 ;; create Reconciler instance
 (defonce reconciler
